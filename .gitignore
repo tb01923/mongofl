@@ -1,0 +1,25 @@
+**/node_modules
+reports/*
+.idea/*
+.DS_Store
+npm-debug.log
+build/**
+
+# Test results
+jest.json
+
+# IDE or Text Editor Files
+.idea/
+.vscode/
+
+# built src
+dist/
+build/
+
+# Compiled CSS
+*.css
+
+# Coverage Reports
+coverage/**
+
+**/__snapshots__/**

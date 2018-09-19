@@ -1,0 +1,32 @@
+{
+  "name": "mongofl",
+  "version": "1.0.0",
+  "description": "fanatsy land wrapper around the mongodb client",
+  "main": "mongo-executer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tb01923/mongofl.git"
+  },
+  "keywords": [
+    "mongodb",
+    "fantasy-land",
+    "sanctuary",
+    "functional"
+  ],
+  "author": "",
+  "license": "SEE LICENSE IN <LICENSE>",
+  "bugs": {
+    "url": "https://github.com/tb01923/mongofl/issues"
+  },
+  "homepage": "https://github.com/tb01923/mongofl#readme",
+  "dependencies": {
+    "fluture": "^10.1.0",
+    "fluture-sanctuary-types": "^2.2.2",
+    "mongodb": "^3.1.6",
+    "ramda": "^0.25.0",
+    "sanctuary": "^0.15.0"
+  }
+}
