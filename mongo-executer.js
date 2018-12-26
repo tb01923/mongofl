@@ -1,9 +1,7 @@
-const {create, env} = require('sanctuary');
-const {env: flutureEnv} = require('fluture-sanctuary-types');
 const F = require('fluture');
-const S = create({checkTypes: false, env: env.concat(flutureEnv)});
 const R = require('ramda');
-const MongoClient = require('mongodb').MongoClient;
+const { MongoClient } = require('mongodb');
+const S = require('./util/sanctuary');
 
 const mongoClientConnect = R.curry(MongoClient.connect);
 const connect = (host, database) => F.node(
@@ -50,7 +48,7 @@ const getResult = (cursor) => {
     // Mongo 3.0.x support
     if (cursor.result) {
         return F.of(cursor.result);
-        }
+    }
     // Mongo 3.1.x support
     if (cursor.toArray) {
         return F.node(done => cursor.toArray(done));
@@ -68,7 +66,7 @@ const executeFind = R.curry((collection, query, projection, options, db) => {
     return F.try(findInCollection)
         .chainRej(rejector)
         .chain(toArray(options.skip, options.limit));
-    });
+});
 
 const buildFind = (collection, query, projection, skip, limit) => executeFind(collection, query, projection, { skip, limit });
 
@@ -157,7 +155,7 @@ const withConnection = (mongo, dbName = '') => {
     // For mongodb >=3.1.x
     if (dbName && mongo.db) {
         db = mongo.db(dbName);
-}
+    }
 
     if (!db.collection) {
         throw new Error('When providing MongoClient as parameter 1 to withConnection, you must pass in the dbName as parameter 2.');
