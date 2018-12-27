@@ -5,4 +5,7 @@ module.exports = {
             "SwitchCase": 1
         }],
     },
+    env: {
+        mocha: true,
+    },
 };

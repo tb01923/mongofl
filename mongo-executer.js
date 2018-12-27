@@ -7,6 +7,9 @@ const mongoClientConnect = R.curry(MongoClient.connect);
 const connect = (host, database) => F.node(
     mongoClientConnect(`mongodb://${host}/${database}`, null),
 );
+const connectWithUri = (mongoUri, opts) => F.node(
+    mongoClientConnect(mongoUri, opts),
+);
 
 const rejectMongoOf = (collection, query, projection, object) => (e) => {
     const err = {};
@@ -68,7 +71,12 @@ const executeFind = R.curry((collection, query, projection, options, db) => {
         .chain(toArray(options.skip, options.limit));
 });
 
-const buildFind = (collection, query, projection, skip, limit) => executeFind(collection, query, projection, { skip, limit });
+const buildFind = (collection, query, projection, skip, limit) => executeFind(
+    collection,
+    query,
+    projection,
+    { skip, limit },
+);
 
 const executeUpdate = R.curry((collection, query, object, upsert, db) => {
     const updateCollection = () => callback => db.collection(collection).update(query, object, { upsert }, callback);
@@ -181,5 +189,6 @@ module.exports = Object.freeze({
     buildPush,
     buildAggregate,
     connect,
+    connectWithUri,
     withConnection,
 });
