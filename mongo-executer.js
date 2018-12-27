@@ -89,11 +89,16 @@ const executeUpdate = R.curry((collection, query, object, upsert, db) => {
 });
 
 const executeInsert = R.curry((collection, object, db) => {
-    const updateCollection = callback => db.collection(collection).insert(object, callback);
+    let insertCollection;
+    if (Array.isArray(object)) {
+        insertCollection = () => db.collection(collection).insertMany(object);
+    } else {
+        insertCollection = () => db.collection(collection).insertOne(object);
+    }
 
     const rejector = rejectMongoOf(collection, null, null, object);
 
-    return F.node(updateCollection)
+    return F.tryP(insertCollection)
         .chainRej(rejector);
 });
 
