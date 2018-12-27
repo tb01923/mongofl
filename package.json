@@ -4,7 +4,7 @@
   "description": "fantasy land wrapper around the mongodb client",
   "main": "mongo-executer.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --recursive"
   },
   "repository": {
     "type": "git",
