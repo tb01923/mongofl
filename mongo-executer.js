@@ -128,6 +128,24 @@ const executeInsert = R.curry((collection, object, db) => {
         .chainRej(rejector);
 });
 
+const executeInsertOne = R.curry((collection, object, db) => {
+    const insertCollection = () => db.collection(collection).insertOne(object);
+
+    const rejector = rejectMongoOf(collection, null, null, object);
+
+    return F.tryP(insertCollection)
+        .chainRej(rejector);
+});
+
+const executeInsertMany = R.curry((collection, objects, db) => {
+    const insertCollection = () => db.collection(collection).insertMany(objects);
+
+    const rejector = rejectMongoOf(collection, null, null, objects);
+
+    return F.tryP(insertCollection)
+        .chainRej(rejector);
+});
+
 const executeDeleteOne = R.curry((collection, object, db) => {
     const deleteFromCollection = callback => db.collection(collection).deleteOne(object, callback);
 
@@ -183,9 +201,28 @@ const buildUpdateMany = (collection, query, object) => executeUpdateMany(
     false,
 );
 
-const buildUpsert = (collection, query, object) => executeUpdate(collection, query, object, true);
+const buildUpsert = (collection, query, object) => executeUpdate(
+    collection,
+    query,
+    object,
+    true,
+);
+const buildUpsertOne = (collection, query, object) => executeUpdateOne(
+    collection,
+    query,
+    object,
+    true,
+);
+const buildUpsertMany = (collection, query, object) => executeUpdateMany(
+    collection,
+    query,
+    object,
+    true,
+);
 
 const buildInsert = executeInsert;
+const buildInsertMany = executeInsertMany;
+const buildInsertOne = executeInsertOne;
 
 const buildDeleteOne = executeDeleteOne;
 
@@ -231,7 +268,11 @@ const withConnection = (mongo, dbName = '') => {
 module.exports = Object.freeze({
     buildFind,
     buildUpsert,
+    buildUpsertOne,
+    buildUpsertMany,
     buildInsert,
+    buildInsertOne,
+    buildInsertMany,
     buildDeleteOne,
     buildUpdate,
     buildUpdateOne,
