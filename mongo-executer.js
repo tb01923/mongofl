@@ -2,6 +2,7 @@ const F = require('fluture');
 const R = require('ramda');
 const { MongoClient } = require('mongodb');
 const S = require('./util/sanctuary');
+const { updateObject } = require('./util/mongo-3x-compatibility');
 
 const mongoClientConnect = R.curry(MongoClient.connect);
 const connect = (host, database) => F.node(
@@ -79,11 +80,36 @@ const buildFind = (collection, query, projection, skip, limit) => executeFind(
 );
 
 const executeUpdate = R.curry((collection, query, object, upsert, db) => {
-    const updateCollection = () => callback => db.collection(collection).update(query, object, { upsert }, callback);
+    const updatedObject = updateObject(object);
+    const updateCollection = () => db.collection(collection).updateMany(
+        query,
+        updatedObject,
+        { upsert },
+    );
+
+    const rejector = rejectMongoOf(collection, query, null, updatedObject);
+
+    return F.tryP(updateCollection)
+        .chainRej(rejector)
+        .chain(getResult);
+});
+
+const executeUpdateOne = R.curry((collection, query, object, upsert, db) => {
+    const updateCollection = () => db.collection(collection).updateOne(query, object, { upsert });
 
     const rejector = rejectMongoOf(collection, query, null, object);
 
-    return F.node(updateCollection(query, object, upsert))
+    return F.tryP(updateCollection)
+        .chainRej(rejector)
+        .chain(getResult);
+});
+
+const executeUpdateMany = R.curry((collection, query, object, upsert, db) => {
+    const updateCollection = () => db.collection(collection).updateMany(query, object, { upsert });
+
+    const rejector = rejectMongoOf(collection, query, null, object);
+
+    return F.tryP(updateCollection)
         .chainRej(rejector)
         .chain(getResult);
 });
@@ -138,7 +164,24 @@ const executeAggregate = R.curry((collection, query, lookUp, sort, projection, d
 });
 
 
-const buildUpdate = (collection, query, object) => executeUpdate(collection, query, object, false);
+const buildUpdate = (collection, query, object) => executeUpdate(
+    collection,
+    query,
+    object,
+    false,
+);
+const buildUpdateOne = (collection, query, object) => executeUpdateOne(
+    collection,
+    query,
+    object,
+    false,
+);
+const buildUpdateMany = (collection, query, object) => executeUpdateMany(
+    collection,
+    query,
+    object,
+    false,
+);
 
 const buildUpsert = (collection, query, object) => executeUpdate(collection, query, object, true);
 
@@ -191,6 +234,8 @@ module.exports = Object.freeze({
     buildInsert,
     buildDeleteOne,
     buildUpdate,
+    buildUpdateOne,
+    buildUpdateMany,
     buildPush,
     buildAggregate,
     connect,
