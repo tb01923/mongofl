@@ -104,7 +104,6 @@ describe('mongo executer insert many', () => {
                     const value = S.show(res);
                     chai.expect(value).to.contain('duplicate key error');
 
-
                     const query = {};
                     const findStatement = mongoExecuter.buildFind(collectionName, query);
                     const foundRows = await mongoExecuter.withConnection(mongoClient, dbName)
