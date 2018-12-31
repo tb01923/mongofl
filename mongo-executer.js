@@ -157,11 +157,11 @@ const executeDeleteOne = R.curry((collection, object, db) => {
 
 
 const executePush = R.curry((collection, query, object, db) => {
-    const updateCollection = () => callback => db.collection(collection).update(query, { $push: object }, callback);
+    const updateCollection = () => db.collection(collection).updateMany(query, { $push: object });
 
     const rejector = rejectMongoOf(collection, query, null, object);
 
-    return F.node(updateCollection(query, object))
+    return F.tryP(updateCollection)
         .chainRej(rejector)
         .chain(getResult);
 });
